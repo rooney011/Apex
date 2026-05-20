@@ -134,8 +134,9 @@ function NotificationsButton() {
               <div>
                 <p className="label-mono text-apex-amber">NEXT_SESSION</p>
                 <p className="font-sans text-[13px] mt-0.5">
-                  Live countdown in topbar. Swaps to real OpenF1 data when{" "}
-                  <code className="font-mono text-apex-red">apex-api</code> is deployed.
+                  Live countdown in topbar. Sourced from OpenF1 via{" "}
+                  <code className="font-mono text-apex-red">/api/live/next-session</code>,
+                  cached 60s.
                 </p>
               </div>
               <div className="border-t border-apex-border pt-3">
@@ -152,15 +153,46 @@ function NotificationsButton() {
   );
 }
 
+type LiveSession = {
+  session_name: string | null;
+  session_type: string | null;
+  country: string | null;
+  circuit: string | null;
+  date_start: string | null;
+};
+
 function LiveStrip() {
-  /* Placeholder for OpenF1 "next session" countdown.
-     Phase 1 swaps in real fetch; for now we tick a static demo value. */
+  /* Live tick for the countdown */
   const [now, setNow] = useState<Date | null>(null);
+  /* The actual next session from OpenF1 via our route handler */
+  const [session, setSession] = useState<LiveSession | null>(null);
+  /* Whether the route returned no upcoming session or errored */
+  const [empty, setEmpty] = useState<boolean>(false);
 
   useEffect(() => {
     setNow(new Date());
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/live/next-session")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!alive) return;
+        if (data?.session?.date_start) {
+          setSession(data.session as LiveSession);
+        } else {
+          setEmpty(true);
+        }
+      })
+      .catch(() => {
+        if (alive) setEmpty(true);
+      });
+    return () => {
+      alive = false;
+    };
   }, []);
 
   if (!now) {
@@ -172,10 +204,27 @@ function LiveStrip() {
     );
   }
 
-  /* Fake target: next Sunday 14:00 local. Real countdown comes in Phase 1. */
-  const target = new Date(now);
-  target.setDate(target.getDate() + ((7 - target.getDay()) % 7 || 7));
-  target.setHours(14, 0, 0, 0);
+  /* If route handler returned no upcoming session, show OFFSEASON badge. */
+  if (empty && !session) {
+    return (
+      <div className="hidden lg:flex items-center gap-3 rounded-md border border-apex-border px-3 py-1.5 shrink-0">
+        <span className="label-mono text-apex-muted">CALENDAR</span>
+        <span className="font-mono text-[12px] text-foreground">OFFSEASON</span>
+      </div>
+    );
+  }
+
+  /* No data yet — show loading dashes. */
+  if (!session || !session.date_start) {
+    return (
+      <div className="hidden lg:flex items-center gap-3 rounded-md border border-apex-border px-3 py-1.5 shrink-0">
+        <span className="label-mono text-apex-muted">NEXT_SESSION</span>
+        <span className="font-mono text-[12px] text-foreground">--:--:--</span>
+      </div>
+    );
+  }
+
+  const target = new Date(session.date_start);
   const ms = Math.max(0, target.getTime() - now.getTime());
   const dd = Math.floor(ms / 86400000);
   const hh = Math.floor((ms / 3600000) % 24);
@@ -183,9 +232,20 @@ function LiveStrip() {
   const ss = Math.floor((ms / 1000) % 60);
   const pad = (n: number) => n.toString().padStart(2, "0");
 
+  const tag = session.country
+    ? `${session.country.toUpperCase()} · ${session.session_name?.toUpperCase() ?? "SESSION"}`
+    : "NEXT_SESSION";
+
   return (
-    <div className="hidden lg:flex items-center gap-3 rounded-md border border-apex-border px-3 py-1.5 shrink-0">
-      <span className="label-mono text-apex-muted">NEXT_SESSION</span>
+    <div
+      className="hidden lg:flex items-center gap-3 rounded-md border border-apex-border px-3 py-1.5 shrink-0"
+      title={
+        session.session_name && session.circuit
+          ? `${session.session_name} · ${session.circuit}`
+          : "Next F1 session"
+      }
+    >
+      <span className="label-mono text-apex-muted truncate max-w-[160px]">{tag}</span>
       <span className="font-mono text-[12px] text-foreground tracking-wider">
         {dd}d&nbsp;{pad(hh)}:{pad(mm)}:{pad(ss)}
       </span>

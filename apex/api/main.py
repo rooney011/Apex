@@ -37,6 +37,9 @@ app.add_middleware(
         "http://localhost:3000",
         "http://127.0.0.1:3000",
     ],
+    # Any subdomain of vercel.app + any custom domain you point at it.
+    # Public data API, read-only, no cookies — wide CORS is acceptable.
+    allow_origin_regex=r"^https://([a-z0-9-]+\.)?vercel\.app$|^https://apex\.[a-z0-9-]+\.[a-z]+$",
     allow_methods=["GET", "OPTIONS"],
     allow_headers=["*"],
 )
