@@ -4,6 +4,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Extra breakpoint for the smallest phones (iPhone SE 1, Galaxy Fold). */
+@theme {
+  --breakpoint-xs: 22rem; /* 352px */
+}
+
 /* =========================================================================
    APEX — HUD design tokens
    Dark-only race-engineer aesthetic, F1 red primary.
@@ -224,5 +229,23 @@
     text-shadow:
       0 0 6px rgba(255, 24, 1, 0.6),
       0 0 18px rgba(255, 24, 1, 0.35);
+  }
+
+  /* Hide the scrollbar but keep scroll behaviour — used for horizontally
+     scrolling tab nav on tight mobile widths. */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* iOS safe-area helpers */
+  .safe-bottom {
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
+  .safe-top {
+    padding-top: max(0.5rem, env(safe-area-inset-top));
   }
 }

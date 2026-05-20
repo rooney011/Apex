@@ -16,12 +16,12 @@ export function Topbar() {
     <header
       className={cn(
         "relative z-50 h-14 shrink-0 border-b border-apex-border bg-apex-surface/80 backdrop-blur",
-        "flex items-center gap-3 px-4",
+        "flex items-center gap-2 sm:gap-3 px-3 sm:px-4",
       )}
     >
       <MobileDrawer />
 
-      {/* Lap-time pill */}
+      {/* Lap-time pill — only on lg+ where there's space */}
       <div className="hidden lg:flex items-center gap-3 pr-4 border-r border-apex-border">
         <span className="label-mono">LAP_TIME</span>
         <span className="font-mono text-base font-bold tracking-wider text-foreground">
@@ -33,8 +33,8 @@ export function Topbar() {
         </span>
       </div>
 
-      {/* Tab nav */}
-      <nav className="flex items-center gap-1">
+      {/* Tab nav — horizontally scrollable on tiny widths so it never breaks */}
+      <nav className="flex-1 min-w-0 flex items-center gap-1 overflow-x-auto no-scrollbar">
         {TOP_TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = pathname === tab.href;
@@ -43,7 +43,7 @@ export function Topbar() {
               key={tab.href}
               href={tab.href}
               className={cn(
-                "group relative flex items-center gap-2 rounded-md px-3 py-1.5",
+                "group relative flex items-center gap-1.5 sm:gap-2 rounded-md px-2 sm:px-3 py-1.5 shrink-0",
                 "font-sans text-[13px] font-medium transition-colors",
                 isActive
                   ? "text-foreground"
@@ -51,7 +51,8 @@ export function Topbar() {
               )}
             >
               <Icon className="size-3.5" strokeWidth={1.6} />
-              {tab.label}
+              {/* Hide labels on very narrow screens; icons keep the row scannable */}
+              <span className="hidden xs:inline sm:inline">{tab.label}</span>
               <span
                 className={cn(
                   "absolute -bottom-[15px] left-2 right-2 h-[2px] rounded-full transition-all",
@@ -65,13 +66,11 @@ export function Topbar() {
         })}
       </nav>
 
-      <div className="flex-1" />
-
-      {/* Live strip */}
+      {/* Live strip — hidden under md to keep the topbar from cramming */}
       <LiveStrip />
 
-      {/* Right tools — every entry here is wired to a real action */}
-      <div className="hidden md:flex items-center gap-1 border-l border-apex-border pl-3">
+      {/* Right tools — only md+ have room for them */}
+      <div className="hidden md:flex items-center gap-1 border-l border-apex-border pl-3 shrink-0">
         <CommandPaletteTrigger />
         <NotificationsButton />
         <Link
@@ -166,7 +165,7 @@ function LiveStrip() {
 
   if (!now) {
     return (
-      <div className="hidden md:flex items-center gap-3 rounded-md border border-apex-border px-3 py-1.5">
+      <div className="hidden lg:flex items-center gap-3 rounded-md border border-apex-border px-3 py-1.5 shrink-0">
         <span className="label-mono text-apex-muted">NEXT_SESSION</span>
         <span className="font-mono text-[12px] text-foreground">--:--:--</span>
       </div>
@@ -185,7 +184,7 @@ function LiveStrip() {
   const pad = (n: number) => n.toString().padStart(2, "0");
 
   return (
-    <div className="hidden md:flex items-center gap-3 rounded-md border border-apex-border px-3 py-1.5">
+    <div className="hidden lg:flex items-center gap-3 rounded-md border border-apex-border px-3 py-1.5 shrink-0">
       <span className="label-mono text-apex-muted">NEXT_SESSION</span>
       <span className="font-mono text-[12px] text-foreground tracking-wider">
         {dd}d&nbsp;{pad(hh)}:{pad(mm)}:{pad(ss)}

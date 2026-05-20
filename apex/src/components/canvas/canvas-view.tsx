@@ -57,19 +57,19 @@ export function CanvasView({ initialLap }: Props) {
   }, [params.aspect]);
 
   return (
-    <div className="relative min-h-full px-6 lg:px-8 py-6">
+    <div className="relative min-h-full px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
       {/* Header */}
-      <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-5 mb-6">
+      <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-4 sm:gap-5 mb-5 sm:mb-6">
         <div>
           <p className="label-mono text-apex-red flex items-center gap-2">
             MODULE // CANVAS
             {isFetching && <Loader2 className="size-3 animate-spin" />}
           </p>
-          <h1 className="font-sans text-4xl md:text-5xl font-bold tracking-tight mt-2">
+          <h1 className="font-sans text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mt-2">
             Generative{" "}
             <span className="italic font-serif text-apex-red">Lab</span>
           </h1>
-          <p className="font-serif text-foreground/75 mt-3 max-w-xl text-[14px] leading-relaxed">
+          <p className="font-serif text-foreground/75 mt-3 max-w-xl text-[13px] sm:text-[14px] leading-relaxed">
             Tune the render in real time. Every slider re-paints the SVG. When
             it looks right, pull it down as a vector or as a high-res PNG.
           </p>
@@ -78,7 +78,7 @@ export function CanvasView({ initialLap }: Props) {
       </header>
 
       {/* Main grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-5">
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-4 sm:gap-5">
         {/* Preview column */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -86,20 +86,20 @@ export function CanvasView({ initialLap }: Props) {
           transition={{ duration: 0.6, ease }}
           className="flex flex-col gap-3"
         >
-          <div className="panel p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
+          <div className="panel p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
               <div
-                className="size-2.5 rounded-full"
+                className="size-2.5 rounded-full shrink-0"
                 style={{
                   background: lap.accent,
                   boxShadow: `0 0 10px ${lap.accent}88`,
                 }}
               />
-              <p className="font-sans text-sm font-medium">
+              <p className="font-sans text-sm font-medium truncate">
                 {lap.driver_name} · {lap.year} · {lap.track}
               </p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4 shrink-0">
               <Pill label="LAP">{lap.lap_time_str}</Pill>
               <Pill label="SAMPLES">{lap.telemetry.samples.toString()}</Pill>
               <Pill label="COMPOUND">{lap.compound ?? "—"}</Pill>

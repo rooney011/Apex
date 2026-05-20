@@ -13,9 +13,11 @@ import {
   Sparkles,
 } from "lucide-react";
 
-/* The HUD top-bar tab nav — one per primary route */
+/* The HUD top-bar tab nav — one per primary product module. About is
+   intentionally NOT in here — it lives in the sidebar instead so the topbar
+   stays focused on the four functional modules. */
 export type TopTab = {
-  href: "/telemetry" | "/gallery" | "/canvas" | "/collector" | "/about";
+  href: "/telemetry" | "/gallery" | "/canvas" | "/collector";
   label: string;
   icon: LucideIcon;
 };
@@ -25,8 +27,11 @@ export const TOP_TABS: TopTab[] = [
   { href: "/gallery", label: "Gallery", icon: Images },
   { href: "/canvas", label: "Canvas", icon: Layers },
   { href: "/collector", label: "Collector", icon: Library },
-  { href: "/about", label: "About", icon: Info },
 ];
+
+/* The Info icon is still exported via this re-export so other components
+   (sidebar About link, command palette) can reuse it cleanly. */
+export const InfoIcon = Info;
 
 /* The sidebar's channel list — only meaningful on the Telemetry view, but
    we render it everywhere as the HUD spine. */

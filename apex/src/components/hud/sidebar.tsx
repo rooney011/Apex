@@ -1,8 +1,9 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { Loader2, RefreshCw } from "lucide-react";
+import { Info, Loader2, RefreshCw } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { APEX_BUILD, APEX_LOGO_SUB, CHANNELS } from "@/lib/nav";
 import { useScrubStore } from "@/lib/store/scrub";
@@ -13,8 +14,10 @@ export function Sidebar() {
   const activeChannel = useScrubStore((s) => s.activeChannel);
   const setActiveChannel = useScrubStore((s) => s.setActiveChannel);
   const activeLapId = useScrubStore((s) => s.activeLapId);
+  const pathname = usePathname();
   const queryClient = useQueryClient();
   const [syncing, setSyncing] = useState(false);
+  const aboutActive = pathname === "/about";
 
   const onSync = async () => {
     setSyncing(true);
@@ -47,12 +50,17 @@ export function Sidebar() {
         <p className="label-mono px-2 pb-3">TELEMETRY · CHANNELS</p>
         <ul className="flex flex-col gap-1">
           {CHANNELS.map((ch) => {
-            const isActive = activeChannel === ch.id;
+            /* "Active" here means: the channel is selected AND the user is
+               actually on the telemetry route. Off-route the badge reads
+               READY since clicking will both switch channel and navigate. */
+            const isSelected = activeChannel === ch.id;
+            const onTelemetry = pathname === "/telemetry";
+            const isActive = isSelected && onTelemetry;
             const Icon = ch.icon;
             return (
               <li key={ch.id}>
-                <button
-                  type="button"
+                <Link
+                  href="/telemetry"
                   onClick={() => setActiveChannel(ch.id)}
                   className={cn(
                     "group relative w-full rounded-md border border-transparent",
@@ -94,11 +102,64 @@ export function Sidebar() {
                   >
                     {isActive ? "ACTIVE" : "READY"}
                   </span>
-                </button>
+                </Link>
               </li>
             );
           })}
         </ul>
+
+        {/* About — sits under the channels, with a pulsing dot so it's
+           discoverable without competing in the topbar. */}
+        <div className="mt-4 pt-4 border-t border-apex-border/70">
+          <p className="label-mono px-2 pb-3">SUPPORT</p>
+          <Link
+            href="/about"
+            className={cn(
+              "group relative w-full rounded-md border border-transparent",
+              "flex items-center gap-3 px-3 py-2 text-left transition-colors",
+              aboutActive
+                ? "bg-apex-bg border-apex-border"
+                : "hover:bg-apex-bg/60",
+            )}
+          >
+            <span
+              className={cn(
+                "absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full transition-opacity",
+                aboutActive ? "bg-apex-red glow-red opacity-100" : "opacity-0",
+              )}
+            />
+            <Info
+              className={cn(
+                "size-4 transition-colors",
+                aboutActive ? "text-apex-red" : "text-apex-muted",
+              )}
+              strokeWidth={1.6}
+            />
+            <div className="flex-1 min-w-0">
+              <p className="label-mono leading-none">DOC_00</p>
+              <p
+                className={cn(
+                  "font-sans text-[13px] font-medium leading-tight mt-1",
+                  aboutActive ? "text-foreground" : "text-foreground/80",
+                )}
+              >
+                About APEX
+              </p>
+            </div>
+            {/* Pulsing "read me" indicator — calms down once you've visited */}
+            <span className="relative flex size-2 shrink-0">
+              {!aboutActive && (
+                <span className="absolute inset-0 rounded-full bg-apex-red animate-ping opacity-60" />
+              )}
+              <span
+                className={cn(
+                  "relative rounded-full size-2",
+                  aboutActive ? "bg-apex-muted" : "bg-apex-red",
+                )}
+              />
+            </span>
+          </Link>
+        </div>
       </nav>
 
       {/* Sync action — re-pulls the active lap + index from source */}

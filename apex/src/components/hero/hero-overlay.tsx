@@ -13,7 +13,7 @@ export function HeroOverlay({ lap }: Props) {
   return (
     <div className="pointer-events-none absolute inset-0 z-10">
       {/* Top bar with brand + secondary nav */}
-      <header className="pointer-events-auto absolute top-0 inset-x-0 px-6 py-5 flex items-start justify-between">
+      <header className="pointer-events-auto absolute top-0 inset-x-0 px-4 sm:px-6 py-4 sm:py-5 flex items-start justify-between gap-3">
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -29,7 +29,7 @@ export function HeroOverlay({ lap }: Props) {
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1, ease }}
-          className="flex items-center gap-3"
+          className="hidden sm:flex items-center gap-3"
         >
           <Link
             href="/gallery"
@@ -53,7 +53,7 @@ export function HeroOverlay({ lap }: Props) {
       </header>
 
       {/* Centre block */}
-      <div className="absolute inset-0 grid place-items-center px-6">
+      <div className="absolute inset-0 grid place-items-center px-4 sm:px-6">
         <div className="w-full max-w-3xl text-center">
           <motion.p
             initial={{ opacity: 0, y: 8 }}
@@ -68,7 +68,7 @@ export function HeroOverlay({ lap }: Props) {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.35, ease }}
-            className="font-sans text-6xl md:text-8xl font-black tracking-tight mt-4"
+            className="font-sans text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mt-3 sm:mt-4"
             style={{ letterSpacing: "-0.04em" }}
           >
             Every lap has a{" "}
@@ -84,7 +84,7 @@ export function HeroOverlay({ lap }: Props) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.7, ease }}
-            className="font-serif text-base md:text-lg text-foreground/75 mt-6 max-w-xl mx-auto leading-relaxed"
+            className="font-serif text-sm sm:text-base md:text-lg text-foreground/75 mt-4 sm:mt-6 max-w-xl mx-auto leading-relaxed"
           >
             APEX takes raw Formula 1 telemetry and unfolds it as a 3D ribbon —
             elevation by speed, colour by throttle, red flares at every brake
@@ -95,11 +95,11 @@ export function HeroOverlay({ lap }: Props) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.95, ease }}
-            className="pointer-events-auto mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
+            className="pointer-events-auto mt-6 sm:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4"
           >
             <Link
               href="/telemetry"
-              className="group inline-flex items-center gap-3 rounded-md bg-apex-red text-white px-6 py-3.5 glow-red transition-transform hover:scale-[1.02] active:scale-[0.99]"
+              className="group inline-flex items-center justify-center gap-3 rounded-md bg-apex-red text-white px-5 sm:px-6 py-3 sm:py-3.5 glow-red transition-transform hover:scale-[1.02] active:scale-[0.99]"
             >
               <span className="label-mono !text-white">ENTER_TELEMETRY</span>
               <ArrowRight
@@ -109,7 +109,7 @@ export function HeroOverlay({ lap }: Props) {
             </Link>
             <Link
               href="/gallery"
-              className="inline-flex items-center gap-2 rounded-md border border-apex-border bg-apex-surface/60 backdrop-blur px-5 py-3 text-foreground hover:bg-apex-surface transition-colors"
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-apex-border bg-apex-surface/60 backdrop-blur px-5 py-2.5 sm:py-3 text-foreground hover:bg-apex-surface transition-colors"
             >
               <span className="label-mono">Browse the gallery</span>
             </Link>
@@ -118,8 +118,11 @@ export function HeroOverlay({ lap }: Props) {
       </div>
 
       {/* Bottom strip — lap stats + interaction hint */}
-      <footer className="pointer-events-none absolute bottom-0 inset-x-0 px-6 py-5">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <footer
+        className="pointer-events-none absolute bottom-0 inset-x-0 px-4 sm:px-6 py-4 sm:py-5"
+        style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
+      >
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
           <StatPill
             label="LAP_TIME"
             value={lap.lap_time_str}

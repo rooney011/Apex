@@ -58,7 +58,8 @@ export function LapInspector({ lap, onClose }: Props) {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.45, ease }}
-            className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-[560px] bg-apex-surface border-l border-apex-border shadow-[-30px_0_60px_rgba(0,0,0,0.5)] overflow-y-auto"
+            className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-[560px] bg-apex-surface border-l border-apex-border shadow-[-30px_0_60px_rgba(0,0,0,0.5)] overflow-y-auto overscroll-contain"
+            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
           >
             <InspectorBody
               lap={lap}
@@ -87,7 +88,7 @@ function InspectorBody({
   const poster = POSTER_AVAILABLE[lap.id];
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-5">
         <div>

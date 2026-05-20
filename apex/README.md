@@ -1,6 +1,7 @@
 # APEX
 
-Formula 1 telemetry, reimagined as a race engineer's operating system.
+> Formula 1 telemetry, reimagined as a race engineer's operating system.
+> A personal project by **[Aneesh](https://github.com/rooney011)**.
 
 - **Hero** — `/` — 3D track ribbon (GPS extruded by speed, throttle-coloured), F1 car GLB, postprocessed bloom
 - **Telemetry** — `/telemetry` — D3 velocity / G-load / throttle / brake / sector views, scrub bar, diagnostic panel

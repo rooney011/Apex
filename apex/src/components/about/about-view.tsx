@@ -27,7 +27,7 @@ const ease = [0.22, 1, 0.36, 1] as const;
 
 export function AboutView() {
   return (
-    <div className="relative min-h-full px-6 lg:px-10 py-8 max-w-[1280px] mx-auto">
+    <div className="relative min-h-full px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1280px] mx-auto">
       <Header />
 
       <Section
@@ -113,7 +113,7 @@ function Header() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease }}
-        className="font-sans text-5xl md:text-6xl font-black tracking-tight mt-2"
+        className="font-sans text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mt-2"
         style={{ letterSpacing: "-0.03em" }}
       >
         A field guide to{" "}
@@ -128,6 +128,23 @@ function Header() {
         What this is. Why it exists. What every button does — including the
         red <span className="font-mono text-apex-red">SYNC_SENSORS</span>{" "}
         that nobody asked about. Skim or read it through.
+      </motion.p>
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.25, ease }}
+        className="label-mono mt-3"
+      >
+        BUILT_BY{" "}
+        <a
+          href="https://github.com/rooney011"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-apex-red hover:text-foreground transition-colors"
+        >
+          ANEESH
+        </a>{" "}
+        · ONE_PERSON_ENGINEERING_TEAM
       </motion.p>
 
       <nav className="mt-7 flex flex-wrap gap-2">
@@ -897,7 +914,7 @@ function CreditsSection() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.6, ease }}
-        className="panel p-8 relative overflow-hidden"
+        className="panel p-6 sm:p-8 relative overflow-hidden"
       >
         <div
           className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-apex-red to-transparent"
@@ -905,19 +922,48 @@ function CreditsSection() {
         />
         <p className="label-mono text-apex-red">CREDITS · COLOPHON</p>
         <h2 className="font-sans text-3xl md:text-4xl font-bold tracking-tight mt-2 max-w-3xl">
-          A personal project. Not affiliated with{" "}
-          <span className="italic font-serif text-apex-red">Formula 1</span>,
-          the FIA, or any team.
+          A personal project. Designed and built by{" "}
+          <span className="italic font-serif text-apex-red">Aneesh</span>.
         </h2>
         <p className="font-serif text-foreground/80 mt-4 leading-relaxed max-w-3xl">
-          APEX is built and maintained as a personal exploration of what
-          telemetry could look like if it was designed for someone outside the
-          engineering bay. The data is real and public; the visual choices are
-          editorial. No commercial use, no team affiliation, no claim to the
-          underlying timing feeds — credit there goes to FastF1, OpenF1 and
-          Jolpica.
+          APEX is a personal exploration of what Formula 1 telemetry could look
+          like if it was designed for someone outside the engineering bay.
+          Every part of the design system, data pipeline, 3D scene, generative
+          renderer and HUD chrome was hand-built across a few weeks of evening
+          work. The data itself is real and public; the visual choices are
+          editorial.
         </p>
-        <div className="flex flex-wrap gap-3 mt-6">
+        <p className="font-serif text-foreground/65 mt-3 leading-relaxed max-w-3xl text-[14px]">
+          Not affiliated with Formula 1, the FIA, or any team. Source data
+          credit goes to FastF1, OpenF1 and Jolpica. No commercial use, no
+          team affiliation.
+        </p>
+
+        {/* Author signature block */}
+        <div className="mt-6 panel-inset p-5 max-w-2xl">
+          <p className="label-mono text-apex-red">SIGNED</p>
+          <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 mt-2">
+            <p
+              className="font-serif italic text-3xl sm:text-4xl font-bold text-foreground tracking-tight"
+              style={{ letterSpacing: "-0.02em" }}
+            >
+              Aneesh
+            </p>
+            <a
+              href="https://github.com/rooney011"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="label-mono text-apex-red hover:text-foreground transition-colors"
+            >
+              github.com/rooney011
+            </a>
+          </div>
+          <p className="label-mono mt-3 !text-[10px] text-apex-muted">
+            APEX_OS // 0.1.0 · BUILD_2026.05 · ONE_PERSON_ENGINEERING_TEAM
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-3 mt-7">
           <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-md bg-apex-red text-white px-5 py-2.5 glow-red transition-transform hover:scale-[1.02] active:scale-[0.99]"
@@ -932,6 +978,14 @@ function CreditsSection() {
             <Gauge className="size-3.5" strokeWidth={1.6} />
             <span className="label-mono">JUMP_TO_TELEMETRY</span>
           </Link>
+          <a
+            href="https://github.com/rooney011/Apex"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded border border-apex-border px-4 py-2 hover:bg-apex-surface-2 transition-colors"
+          >
+            <span className="label-mono">VIEW_SOURCE_ON_GITHUB</span>
+          </a>
         </div>
       </motion.div>
     </section>

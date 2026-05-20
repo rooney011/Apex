@@ -38,7 +38,7 @@ export function CollectorView() {
   };
 
   return (
-    <div className="relative min-h-full px-6 lg:px-10 py-8">
+    <div className="relative min-h-full px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
           <motion.p
@@ -53,7 +53,7 @@ export function CollectorView() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease }}
-            className="font-sans text-4xl md:text-5xl font-bold tracking-tight mt-2"
+            className="font-sans text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mt-2"
           >
             Your{" "}
             <span className="italic font-serif text-apex-red">Collection</span>

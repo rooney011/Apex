@@ -17,9 +17,9 @@ export function GalleryView({ laps }: Props) {
   const open = openId ? laps.find((l) => l.id === openId) ?? null : null;
 
   return (
-    <div className="relative min-h-full px-6 lg:px-10 py-8">
+    <div className="relative min-h-full px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
       {/* Header */}
-      <header className="mb-10">
+      <header className="mb-8 sm:mb-10">
         <motion.p
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
@@ -32,7 +32,7 @@ export function GalleryView({ laps }: Props) {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease }}
-          className="font-sans text-5xl md:text-6xl font-black tracking-tight mt-2"
+          className="font-sans text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mt-2"
           style={{ letterSpacing: "-0.03em" }}
         >
           The Apex{" "}

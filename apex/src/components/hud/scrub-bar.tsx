@@ -79,12 +79,12 @@ export function ScrubBar({ lap }: Props) {
   }, [scrubDistance, totalDist, setScrubDistance]);
 
   return (
-    <div className="panel p-3 flex items-center gap-3">
+    <div className="panel p-2 sm:p-3 flex items-center gap-2 sm:gap-3">
       {/* Controls */}
       <button
         type="button"
         onClick={() => setScrubDistance(0)}
-        className="size-8 grid place-items-center rounded text-apex-muted hover:text-foreground hover:bg-apex-surface-2"
+        className="size-7 sm:size-8 grid place-items-center rounded text-apex-muted hover:text-foreground hover:bg-apex-surface-2 shrink-0"
         aria-label="restart"
       >
         <SkipBack className="size-4" strokeWidth={1.6} />
@@ -92,13 +92,13 @@ export function ScrubBar({ lap }: Props) {
       <button
         type="button"
         onClick={() => setScrubDistance(totalDist)}
-        className="size-8 grid place-items-center rounded text-apex-muted hover:text-foreground hover:bg-apex-surface-2"
+        className="size-7 sm:size-8 grid place-items-center rounded text-apex-muted hover:text-foreground hover:bg-apex-surface-2 shrink-0"
         aria-label="end"
       >
         <SkipForward className="size-4" strokeWidth={1.6} />
       </button>
 
-      <span className="label-mono w-16 shrink-0 text-foreground">
+      <span className="label-mono w-14 sm:w-16 shrink-0 text-foreground !text-[10px] sm:!text-[11px]">
         {fmtClock(elapsedMs)}
       </span>
 
@@ -135,7 +135,7 @@ export function ScrubBar({ lap }: Props) {
         />
       </div>
 
-      <span className="label-mono w-16 shrink-0 text-right">
+      <span className="label-mono w-14 sm:w-16 shrink-0 text-right !text-[10px] sm:!text-[11px]">
         {fmtClock(totalMs)}
       </span>
 

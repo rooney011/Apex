@@ -59,9 +59,9 @@ export function TelemetryView({ initialLap }: Props) {
         }}
       />
 
-      <div className="px-6 lg:px-8 py-6">
+      <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
         {/* Header row */}
-        <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-6">
+        <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-4 sm:gap-6 mb-5 sm:mb-6">
           <div>
             <p className="label-mono text-apex-red flex items-center gap-2">
               MODULE // {channelKicker(activeChannel)}
@@ -69,10 +69,10 @@ export function TelemetryView({ initialLap }: Props) {
                 <Loader2 className="size-3 animate-spin" strokeWidth={2} />
               )}
             </p>
-            <h1 className="font-sans text-4xl md:text-5xl font-bold tracking-tight mt-2">
+            <h1 className="font-sans text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mt-2">
               {lap.driver_name}
             </h1>
-            <p className="font-mono text-[11px] tracking-[0.18em] text-apex-muted mt-2 uppercase">
+            <p className="font-mono text-[10px] sm:text-[11px] tracking-[0.18em] text-apex-muted mt-2 uppercase">
               {lap.team || "—"} · {lap.race} {lap.year} · SESSION {lap.session}
             </p>
             <div
@@ -87,11 +87,11 @@ export function TelemetryView({ initialLap }: Props) {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="panel px-5 py-3 min-w-[200px]">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+            <div className="panel px-4 sm:px-5 py-3 min-w-0 sm:min-w-[200px]">
               <p className="label-mono">LAP_TIME</p>
               <p
-                className="font-mono text-3xl font-bold mt-1 text-glow-red"
+                className="font-mono text-2xl sm:text-3xl font-bold mt-1 text-glow-red"
                 style={{ color: lap.accent }}
               >
                 {lap.lap_time_str}
@@ -105,7 +105,7 @@ export function TelemetryView({ initialLap }: Props) {
         </header>
 
         {/* Main grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-4">
+        <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-3 sm:gap-4">
           {/* Centre column — active chart */}
           <div className="flex flex-col gap-3">
             <div className="panel p-4">
@@ -156,12 +156,12 @@ export function TelemetryView({ initialLap }: Props) {
         </div>
 
         {/* Scrub bar pinned at the bottom of the view */}
-        <div className="mt-4">
+        <div className="mt-3 sm:mt-4">
           <ScrubBar lap={lap} />
         </div>
 
-        {/* Hint */}
-        <p className="label-mono mt-3 text-apex-muted/70">
+        {/* Hint — only on screens with the keyboard hint relevance */}
+        <p className="label-mono mt-3 text-apex-muted/70 hidden sm:block">
           tip · ←/→ to step ±1%, hold shift for ±5%, home/end to snap
         </p>
       </div>
