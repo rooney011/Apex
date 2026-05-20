@@ -3,13 +3,10 @@
 import { motion } from "framer-motion";
 import { ArrowRight, MousePointerClick } from "lucide-react";
 import Link from "next/link";
-import type { Lap } from "@/lib/data/types";
-
-type Props = { lap: Lap };
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-export function HeroOverlay({ lap }: Props) {
+export function HeroOverlay() {
   return (
     <div className="pointer-events-none absolute inset-0 z-10">
       {/* Top bar with brand + secondary nav */}
@@ -117,40 +114,16 @@ export function HeroOverlay({ lap }: Props) {
         </div>
       </div>
 
-      {/* Bottom strip — lap stats + interaction hint */}
+      {/* Bottom strip — interaction hint only */}
       <footer
         className="pointer-events-none absolute bottom-0 inset-x-0 px-4 sm:px-6 py-4 sm:py-5"
         style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
       >
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
-          <StatPill
-            label="LAP_TIME"
-            value={lap.lap_time_str}
-            delay={1.1}
-            accent
-          />
-          <StatPill
-            label="PEAK_VELOCITY"
-            value={`${Math.round(Math.max(...lap.telemetry.speed))} km/h`}
-            delay={1.18}
-          />
-          <StatPill
-            label="TELEMETRY_PTS"
-            value={lap.telemetry.samples.toString()}
-            delay={1.26}
-          />
-          <StatPill
-            label="ERA"
-            value={lap.era}
-            delay={1.34}
-          />
-        </div>
-
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.7 }}
-          transition={{ duration: 0.8, delay: 1.6, ease }}
-          className="mt-4 flex items-center justify-center gap-2 text-apex-muted"
+          transition={{ duration: 0.8, delay: 1.1, ease }}
+          className="flex items-center justify-center gap-2 text-apex-muted"
         >
           <MousePointerClick className="size-3.5" strokeWidth={1.6} />
           <p className="label-mono">drag to orbit · scroll to zoom</p>
@@ -160,33 +133,3 @@ export function HeroOverlay({ lap }: Props) {
   );
 }
 
-function StatPill({
-  label,
-  value,
-  delay,
-  accent,
-}: {
-  label: string;
-  value: string;
-  delay: number;
-  accent?: boolean;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay, ease }}
-      className="rounded border border-apex-border bg-apex-surface/55 backdrop-blur px-4 py-3"
-    >
-      <p className="label-mono">{label}</p>
-      <p
-        className={
-          "font-mono text-base font-bold mt-1 truncate " +
-          (accent ? "text-apex-red text-glow-red" : "text-foreground")
-        }
-      >
-        {value}
-      </p>
-    </motion.div>
-  );
-}

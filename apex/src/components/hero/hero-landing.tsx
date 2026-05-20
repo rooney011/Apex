@@ -21,7 +21,7 @@ export function HeroLanding({ lap }: Props) {
       <SceneErrorBoundary>
         <HeroScene lap={lap} />
       </SceneErrorBoundary>
-      <HeroOverlay lap={lap} />
+      <HeroOverlay />
     </div>
   );
 }
