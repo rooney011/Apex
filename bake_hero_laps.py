@@ -34,14 +34,14 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 @dataclass
 class LapSpec:
-    slug: str
+    slug: str | None     # None -> auto-generate from driver+year+event
     year: int
     event: str           # name FastF1 accepts (e.g. "British Grand Prix")
     session: str         # "Q" / "R" / "S"
-    driver: str          # 3-letter code
+    driver: str | None   # None -> pick session-fastest (pole sitter for Q)
     track: str
     era: str
-    accent: str          # hex, drives the gallery card highlight
+    accent: str | None   # None -> fall back to FastF1's team color
 
 
 HERO_LAPS: list[LapSpec] = [
@@ -115,6 +115,13 @@ HERO_LAPS: list[LapSpec] = [
         era="GROUND EFFECT  ·  MCL39",
         accent="#ffc24d",
     ),
+
+    # 2026 entries were attempted with driver=None (auto-pole-pick) but FastF1
+    # returns either DataNotLoadedError (Bahrain / Imola / Monaco) or stale
+    # duplicate cache data (Saudi + Australia both came back as identical
+    # RUS / 1:18.518 / 565-sample laps, clearly bogus). The 2026 telemetry
+    # feed isn't reliable yet — re-run this script later in the season once
+    # the FastF1 timing servers have populated.
 ]
 
 
@@ -155,13 +162,36 @@ def sector_ms(val) -> int | None:
         return None
 
 
+def _slugify(s: str) -> str:
+    """Lowercase, replace non-alnum with underscores, collapse runs."""
+    out = []
+    last_was_sep = False
+    for c in s.lower():
+        if c.isalnum():
+            out.append(c)
+            last_was_sep = False
+        elif not last_was_sep:
+            out.append("_")
+            last_was_sep = True
+    return "".join(out).strip("_")
+
+
 def bake_one(spec: LapSpec) -> dict:
-    print(f"\n-> {spec.slug}  ({spec.year} {spec.event} | {spec.driver})")
+    """Resolve the spec (auto-pick pole sitter if driver=None, auto-slug if
+    slug=None), pull telemetry, and return a JSON-ready payload."""
+    label = spec.slug or f"{spec.year} {spec.event}"
+    print(f"\n-> {label}  ({spec.year} {spec.event} | {spec.driver or 'auto'})")
     session = fastf1.get_session(spec.year, spec.event, spec.session)
     session.load(telemetry=True, weather=False, messages=False)
 
-    laps = session.laps.pick_drivers(spec.driver)
-    fastest = laps.pick_fastest()
+    if spec.driver:
+        laps = session.laps.pick_drivers(spec.driver)
+        fastest = laps.pick_fastest()
+        driver_code = spec.driver
+    else:
+        # Session-fastest across all drivers — pole sitter for a Q session
+        fastest = session.laps.pick_fastest()
+        driver_code = str(fastest.get("Driver") or "").upper() or "UNK"
 
     car = fastest.get_car_data().add_distance()
     try:
@@ -173,29 +203,32 @@ def bake_one(spec: LapSpec) -> dict:
 
     # Driver / team meta
     try:
-        info = session.get_driver(spec.driver)
-        driver_name = str(info.get("FullName") or info.get("LastName") or spec.driver).upper()
+        info = session.get_driver(driver_code)
+        driver_name = str(info.get("FullName") or info.get("LastName") or driver_code).upper()
         team = str(info.get("TeamName") or "").upper()
         team_color = str(info.get("TeamColor") or "").strip()
         if team_color and not team_color.startswith("#"):
             team_color = "#" + team_color
     except Exception:
-        driver_name = spec.driver
+        driver_name = driver_code
         team = ""
-        team_color = spec.accent
+        team_color = ""
+
+    accent = spec.accent or team_color or "#ff1801"
+    slug = spec.slug or f"{driver_code.lower()}_{spec.year}_{_slugify(spec.event)}_{spec.session.lower()}"
 
     payload = {
-        "id": spec.slug,
+        "id": slug,
         "year": spec.year,
         "race": spec.event,
         "session": spec.session,
         "track": spec.track,
         "era": spec.era,
-        "accent": spec.accent,
-        "driver_code": spec.driver,
+        "accent": accent,
+        "driver_code": driver_code,
         "driver_name": driver_name,
         "team": team,
-        "team_color": team_color or spec.accent,
+        "team_color": team_color or accent,
         "lap_time_str": fmt_lap_time(fastest["LapTime"]),
         "lap_time_ms": int(fastest["LapTime"].total_seconds() * 1000),
         "lap_number": int(fastest["LapNumber"]) if not pd.isna(fastest["LapNumber"]) else None,
@@ -219,7 +252,7 @@ def bake_one(spec: LapSpec) -> dict:
         },
     }
 
-    out_path = OUT_DIR / f"{spec.slug}.json"
+    out_path = OUT_DIR / f"{slug}.json"
     out_path.write_text(json.dumps(payload, separators=(",", ":")))
     size_kb = out_path.stat().st_size / 1024
     print(
@@ -236,7 +269,8 @@ def main() -> None:
         try:
             payload = bake_one(spec)
         except Exception as e:
-            print(f"   FAILED {spec.slug}: {type(e).__name__}: {e}")
+            label = spec.slug or f"{spec.year} {spec.event}"
+            print(f"   FAILED {label}: {type(e).__name__}: {e}")
             continue
 
         summaries.append({
