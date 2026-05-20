@@ -161,13 +161,37 @@ type LiveSession = {
   date_start: string | null;
 };
 
+type LiveStatus = "loading" | "ok" | "empty" | "error";
+
+async function fetchNextSession(
+  attempt = 0,
+): Promise<{ status: LiveStatus; session: LiveSession | null }> {
+  try {
+    const res = await fetch("/api/live/next-session", { cache: "no-store" });
+    if (!res.ok) {
+      throw new Error(`status ${res.status}`);
+    }
+    const data = await res.json();
+    if (data?.session?.date_start) {
+      return { status: "ok", session: data.session as LiveSession };
+    }
+    /* Route handler explicitly returned no upcoming session — true offseason. */
+    return { status: "empty", session: null };
+  } catch {
+    /* Retry up to twice with a small backoff before declaring failure. */
+    if (attempt < 2) {
+      await new Promise((r) => setTimeout(r, 800 * (attempt + 1)));
+      return fetchNextSession(attempt + 1);
+    }
+    return { status: "error", session: null };
+  }
+}
+
 function LiveStrip() {
   /* Live tick for the countdown */
   const [now, setNow] = useState<Date | null>(null);
-  /* The actual next session from OpenF1 via our route handler */
   const [session, setSession] = useState<LiveSession | null>(null);
-  /* Whether the route returned no upcoming session or errored */
-  const [empty, setEmpty] = useState<boolean>(false);
+  const [status, setStatus] = useState<LiveStatus>("loading");
 
   useEffect(() => {
     setNow(new Date());
@@ -177,25 +201,23 @@ function LiveStrip() {
 
   useEffect(() => {
     let alive = true;
-    fetch("/api/live/next-session")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (!alive) return;
-        if (data?.session?.date_start) {
-          setSession(data.session as LiveSession);
-        } else {
-          setEmpty(true);
-        }
-      })
-      .catch(() => {
-        if (alive) setEmpty(true);
-      });
+    const load = async () => {
+      const { status, session } = await fetchNextSession();
+      if (!alive) return;
+      setStatus(status);
+      setSession(session);
+    };
+    load();
+    /* Re-pull every 5 minutes so the countdown doesn't stale if the page
+       stays open for hours. */
+    const id = setInterval(load, 5 * 60 * 1000);
     return () => {
       alive = false;
+      clearInterval(id);
     };
   }, []);
 
-  if (!now) {
+  if (!now || status === "loading") {
     return (
       <div className="hidden lg:flex items-center gap-3 rounded-md border border-apex-border px-3 py-1.5 shrink-0">
         <span className="label-mono text-apex-muted">NEXT_SESSION</span>
@@ -204,8 +226,8 @@ function LiveStrip() {
     );
   }
 
-  /* If route handler returned no upcoming session, show OFFSEASON badge. */
-  if (empty && !session) {
+  /* Truly no upcoming session (route returned 200 + session=null). */
+  if (status === "empty") {
     return (
       <div className="hidden lg:flex items-center gap-3 rounded-md border border-apex-border px-3 py-1.5 shrink-0">
         <span className="label-mono text-apex-muted">CALENDAR</span>
@@ -214,12 +236,13 @@ function LiveStrip() {
     );
   }
 
-  /* No data yet — show loading dashes. */
-  if (!session || !session.date_start) {
+  /* Couldn't reach the upstream — say so, don't lie about offseason. */
+  if (status === "error" || !session?.date_start) {
     return (
       <div className="hidden lg:flex items-center gap-3 rounded-md border border-apex-border px-3 py-1.5 shrink-0">
-        <span className="label-mono text-apex-muted">NEXT_SESSION</span>
-        <span className="font-mono text-[12px] text-foreground">--:--:--</span>
+        <span className="label-mono text-apex-muted">DATA</span>
+        <span className="font-mono text-[12px] text-apex-amber">OFFLINE</span>
+        <span className="size-1.5 rounded-full bg-apex-amber animate-pulse" />
       </div>
     );
   }
