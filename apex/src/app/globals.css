@@ -1,0 +1,228 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* =========================================================================
+   APEX — HUD design tokens
+   Dark-only race-engineer aesthetic, F1 red primary.
+   ========================================================================= */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+  --font-serif: var(--font-source-serif);
+  --font-heading: var(--font-inter);
+
+  /* shadcn token plumbing — kept for component compatibility */
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  /* APEX-specific tokens */
+  --color-apex-red: var(--apex-red);
+  --color-apex-red-dim: var(--apex-red-dim);
+  --color-apex-bg: var(--apex-bg);
+  --color-apex-surface: var(--apex-surface);
+  --color-apex-surface-2: var(--apex-surface-2);
+  --color-apex-border: var(--apex-border);
+  --color-apex-grid: var(--apex-grid);
+  --color-apex-text: var(--apex-text);
+  --color-apex-muted: var(--apex-muted);
+  --color-apex-amber: var(--apex-amber);
+  --color-apex-green: var(--apex-green);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Single root: APEX is dark-only. The .dark class is also exposed below so
+   shadcn components that gate styles on .dark still render correctly. */
+:root,
+.dark {
+  /* APEX palette */
+  --apex-red: #ff1801;
+  --apex-red-dim: #b3160a;
+  --apex-bg: #0a0a0c;
+  --apex-surface: #131319;
+  --apex-surface-2: #1a1a22;
+  --apex-border: #26262e;
+  --apex-grid: #1f1f27;
+  --apex-text: #f4f4f6;
+  --apex-muted: #8a8a96;
+  --apex-amber: #ffb84a;
+  --apex-green: #7bf2b8;
+
+  /* shadcn tokens mapped to APEX palette */
+  --background: var(--apex-bg);
+  --foreground: var(--apex-text);
+  --card: var(--apex-surface);
+  --card-foreground: var(--apex-text);
+  --popover: var(--apex-surface);
+  --popover-foreground: var(--apex-text);
+  --primary: var(--apex-red);
+  --primary-foreground: #ffffff;
+  --secondary: var(--apex-surface-2);
+  --secondary-foreground: var(--apex-text);
+  --muted: var(--apex-surface-2);
+  --muted-foreground: var(--apex-muted);
+  --accent: var(--apex-red-dim);
+  --accent-foreground: #ffffff;
+  --destructive: var(--apex-red);
+  --border: var(--apex-border);
+  --input: var(--apex-border);
+  --ring: var(--apex-red);
+  --chart-1: var(--apex-red);
+  --chart-2: var(--apex-amber);
+  --chart-3: var(--apex-green);
+  --chart-4: #8b8be0;
+  --chart-5: var(--apex-muted);
+  --radius: 0.5rem;
+  --sidebar: var(--apex-surface);
+  --sidebar-foreground: var(--apex-text);
+  --sidebar-primary: var(--apex-red);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--apex-surface-2);
+  --sidebar-accent-foreground: var(--apex-text);
+  --sidebar-border: var(--apex-border);
+  --sidebar-ring: var(--apex-red);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html,
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  html {
+    @apply font-sans;
+    background: var(--apex-bg);
+    color-scheme: dark;
+  }
+  body {
+    background:
+      radial-gradient(
+        ellipse 80% 50% at 50% -10%,
+        rgba(255, 24, 1, 0.06),
+        transparent 60%
+      ),
+      linear-gradient(180deg, #0a0a0c 0%, #08080a 100%);
+    min-height: 100dvh;
+  }
+
+  /* HUD scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--apex-border);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--apex-red-dim);
+  }
+
+  /* Selection */
+  ::selection {
+    background: var(--apex-red);
+    color: #ffffff;
+  }
+
+  /* Honour reduced-motion preference: kill all transitions/animations and
+     keep scroll-jumping (no smooth) so vestibular sensitivity is respected.
+     framer-motion components still consult useReducedMotion individually. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* =========================================================================
+   APEX-specific utilities
+   ========================================================================= */
+@layer utilities {
+  .label-mono {
+    font-family: var(--font-jetbrains-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--apex-muted);
+  }
+
+  .panel {
+    background: var(--apex-surface);
+    border: 1px solid var(--apex-border);
+    border-radius: var(--radius);
+  }
+
+  .panel-inset {
+    background: var(--apex-bg);
+    border: 1px solid var(--apex-border);
+    border-radius: calc(var(--radius) * 0.6);
+  }
+
+  .grid-overlay {
+    background-image:
+      linear-gradient(var(--apex-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--apex-grid) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .glow-red {
+    box-shadow:
+      0 0 18px rgba(255, 24, 1, 0.45),
+      0 0 60px rgba(255, 24, 1, 0.2);
+  }
+
+  .text-glow-red {
+    text-shadow:
+      0 0 6px rgba(255, 24, 1, 0.6),
+      0 0 18px rgba(255, 24, 1, 0.35);
+  }
+}

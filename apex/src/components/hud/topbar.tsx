@@ -1,0 +1,196 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Bell, Library, Search } from "lucide-react";
+import { HERO_LAP_TIME, TOP_TABS } from "@/lib/nav";
+import { useScrubStore } from "@/lib/store/scrub";
+import { cn } from "@/lib/utils";
+import { MobileDrawer } from "./mobile-drawer";
+
+export function Topbar() {
+  const pathname = usePathname();
+
+  return (
+    <header
+      className={cn(
+        "relative z-50 h-14 shrink-0 border-b border-apex-border bg-apex-surface/80 backdrop-blur",
+        "flex items-center gap-3 px-4",
+      )}
+    >
+      <MobileDrawer />
+
+      {/* Lap-time pill */}
+      <div className="hidden lg:flex items-center gap-3 pr-4 border-r border-apex-border">
+        <span className="label-mono">LAP_TIME</span>
+        <span className="font-mono text-base font-bold tracking-wider text-foreground">
+          {HERO_LAP_TIME}
+        </span>
+        <span className="relative flex size-2">
+          <span className="absolute inset-0 rounded-full bg-apex-red animate-ping opacity-60" />
+          <span className="relative rounded-full size-2 bg-apex-red" />
+        </span>
+      </div>
+
+      {/* Tab nav */}
+      <nav className="flex items-center gap-1">
+        {TOP_TABS.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = pathname === tab.href;
+          return (
+            <Link
+              key={tab.href}
+              href={tab.href}
+              className={cn(
+                "group relative flex items-center gap-2 rounded-md px-3 py-1.5",
+                "font-sans text-[13px] font-medium transition-colors",
+                isActive
+                  ? "text-foreground"
+                  : "text-apex-muted hover:text-foreground",
+              )}
+            >
+              <Icon className="size-3.5" strokeWidth={1.6} />
+              {tab.label}
+              <span
+                className={cn(
+                  "absolute -bottom-[15px] left-2 right-2 h-[2px] rounded-full transition-all",
+                  isActive
+                    ? "bg-apex-red opacity-100 glow-red"
+                    : "opacity-0 group-hover:opacity-30 bg-apex-muted",
+                )}
+              />
+            </Link>
+          );
+        })}
+      </nav>
+
+      <div className="flex-1" />
+
+      {/* Live strip */}
+      <LiveStrip />
+
+      {/* Right tools — every entry here is wired to a real action */}
+      <div className="hidden md:flex items-center gap-1 border-l border-apex-border pl-3">
+        <CommandPaletteTrigger />
+        <NotificationsButton />
+        <Link
+          href="/collector"
+          aria-label="Open your collection"
+          title="Open your collection"
+          className="flex size-8 items-center justify-center rounded-md text-apex-muted hover:text-foreground hover:bg-apex-surface-2 transition-colors"
+        >
+          <Library className="size-4" strokeWidth={1.6} />
+        </Link>
+      </div>
+    </header>
+  );
+}
+
+/* Search button: just trips the global palette open. Keyboard ⌘K / Ctrl+K
+   is handled by the palette itself. */
+function CommandPaletteTrigger() {
+  const setOpen = useScrubStore((s) => s.setPaletteOpen);
+  return (
+    <button
+      type="button"
+      onClick={() => setOpen(true)}
+      title="Open command palette (⌘K / Ctrl+K)"
+      aria-label="Open command palette"
+      className="hidden sm:flex items-center gap-2 h-8 px-2.5 rounded-md text-apex-muted hover:text-foreground hover:bg-apex-surface-2 transition-colors"
+    >
+      <Search className="size-3.5" strokeWidth={1.6} />
+      <span className="label-mono hidden lg:inline">SEARCH</span>
+      <span className="hidden lg:inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded border border-apex-border bg-apex-bg font-mono text-[10px] text-apex-muted">
+        ⌘K
+      </span>
+    </button>
+  );
+}
+
+/* Bell: tiny popover showing the OpenF1 next-session info. */
+function NotificationsButton() {
+  const [open, setOpen] = useState(false);
+  /* The popover content reuses the same value the topbar countdown computes
+     (a fake "next Sunday 14:00"). When the FastAPI backend is up the strip
+     swap is one line. */
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        title="Upcoming sessions"
+        aria-label="Notifications"
+        className="relative flex size-8 items-center justify-center rounded-md text-apex-muted hover:text-foreground hover:bg-apex-surface-2 transition-colors"
+      >
+        <Bell className="size-4" strokeWidth={1.6} />
+        <span className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-apex-amber" />
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-full mt-2 z-50 w-72 panel p-4">
+            <p className="label-mono text-apex-red mb-2">NOTIFICATIONS</p>
+            <div className="space-y-3">
+              <div>
+                <p className="label-mono text-apex-amber">NEXT_SESSION</p>
+                <p className="font-sans text-[13px] mt-0.5">
+                  Live countdown in topbar. Swaps to real OpenF1 data when{" "}
+                  <code className="font-mono text-apex-red">apex-api</code> is deployed.
+                </p>
+              </div>
+              <div className="border-t border-apex-border pt-3">
+                <p className="label-mono text-apex-green">DATA_SOURCES</p>
+                <p className="font-mono text-[11px] mt-0.5 text-apex-muted">
+                  FastF1 · OpenF1 · Jolpica
+                </p>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function LiveStrip() {
+  /* Placeholder for OpenF1 "next session" countdown.
+     Phase 1 swaps in real fetch; for now we tick a static demo value. */
+  const [now, setNow] = useState<Date | null>(null);
+
+  useEffect(() => {
+    setNow(new Date());
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  if (!now) {
+    return (
+      <div className="hidden md:flex items-center gap-3 rounded-md border border-apex-border px-3 py-1.5">
+        <span className="label-mono text-apex-muted">NEXT_SESSION</span>
+        <span className="font-mono text-[12px] text-foreground">--:--:--</span>
+      </div>
+    );
+  }
+
+  /* Fake target: next Sunday 14:00 local. Real countdown comes in Phase 1. */
+  const target = new Date(now);
+  target.setDate(target.getDate() + ((7 - target.getDay()) % 7 || 7));
+  target.setHours(14, 0, 0, 0);
+  const ms = Math.max(0, target.getTime() - now.getTime());
+  const dd = Math.floor(ms / 86400000);
+  const hh = Math.floor((ms / 3600000) % 24);
+  const mm = Math.floor((ms / 60000) % 60);
+  const ss = Math.floor((ms / 1000) % 60);
+  const pad = (n: number) => n.toString().padStart(2, "0");
+
+  return (
+    <div className="hidden md:flex items-center gap-3 rounded-md border border-apex-border px-3 py-1.5">
+      <span className="label-mono text-apex-muted">NEXT_SESSION</span>
+      <span className="font-mono text-[12px] text-foreground tracking-wider">
+        {dd}d&nbsp;{pad(hh)}:{pad(mm)}:{pad(ss)}
+      </span>
+      <span className="size-1.5 rounded-full bg-apex-amber animate-pulse" />
+    </div>
+  );
+}

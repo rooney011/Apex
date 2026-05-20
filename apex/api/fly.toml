@@ -1,0 +1,36 @@
+# Fly.io config for the APEX FastAPI service.
+# Run `fly launch --copy-config --no-deploy` from this directory the first time
+# to claim an app name + region; then `fly deploy` to push.
+
+app = "apex-api"
+primary_region = "ord"
+
+[build]
+
+[env]
+  PYTHONUNBUFFERED = "1"
+  FASTF1_CACHE = "/data/fastf1_cache"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/api/health"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "1gb"
+  cpus = 1
+
+[[mounts]]
+  source = "fastf1_cache"
+  destination = "/data"

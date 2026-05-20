@@ -1,0 +1,6 @@
+# Vercel only deploys the Next.js app — exclude the Python service.
+api/
+fastf1_cache/
+.venv/
+__pycache__/
+*.pyc
