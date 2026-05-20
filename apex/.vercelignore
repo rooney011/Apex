@@ -1,6 +1,9 @@
 # Vercel only deploys the Next.js app — exclude the Python service.
-api/
-fastf1_cache/
-.venv/
+# IMPORTANT: leading slash anchors to the deploy root. Without it, `api/`
+# would also match `src/app/api/` (the Next.js Route Handler directory)
+# and our serverless functions would silently disappear from the build.
+/api/
+/fastf1_cache/
+/.venv/
 __pycache__/
 *.pyc
